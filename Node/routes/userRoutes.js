@@ -10,6 +10,6 @@ router.post("/signup", signup);
 router.post("/login", login);
 
 // Protected route for updating profile
-router.put("/update-profile", authMiddleware, updateProfile);
+router.put("/update/profile", authMiddleware, updateProfile);
 
 export default router;

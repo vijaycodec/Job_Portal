@@ -120,8 +120,6 @@ export const login = async (req, res) => {
             success: true
         });
 
-
-
     } catch (error) {
 
         return res.status(500).json({
@@ -133,59 +131,51 @@ export const login = async (req, res) => {
 }
 
 export const updateProfile = async (req, res) => {
-    try {
-        const { fullname, email, phoneNumber, bio, skills } = req.body;
-
-        // Basic validation
-        if (!fullname || !email || !phoneNumber || !bio || !skills) {
-            return res.status(400).json({
-                message: "Something is Missing",
-                success: false,
-            });
-        }
-
-        const skillsArray = skills.split(",");
-        const userId = req.id
-
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(400).json({
-                message: "user Not Found",
-                success: false,
-            });
-        }
-
-        // updating data
-        user.fullname = fullname,
-            user.email = email,
-            user.phoneNumber = phoneNumber,
-            user.profile.bio = bio,
-            user.profile.skills = skillsArray
-
-        await user.save();
-
-        const userData = {
-            id: user._id,
-            fullname: user.fullname,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            role: user.role,
-            profile: user.profile,
-        };
-
-        return res.status(200).json({
-            message: "User data Updated Successfully",
-            user: userData,
-            success: true
-        });
-
-
-    } catch (error) {
-        console.error("Update Profile Error:", error);
-        return res.status(500).json({
-            message: error.message || "Internal Server Error",
-            success: false,
-        });
+  try {
+    const { fullname, email, phoneNumber, bio, skills } = req.body;
+    const userId = req.id; // Set in auth middleware from JWT
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
     }
-}
+
+    // Update only the fields provided
+    if (fullname !== undefined) user.fullname = fullname;
+    if (email !== undefined) user.email = email;
+    if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
+    if (bio !== undefined) user.profile.bio = bio;
+    if (skills !== undefined) {
+      const skillsArray = skills.split(',').map(s => s.trim());
+      user.profile.skills = skillsArray;
+    }
+
+    const updatedUser = await user.save();
+
+    // Prepare safe response data
+    const userData = {
+      id: updatedUser._id,
+      fullname: updatedUser.fullname,
+      email: updatedUser.email,
+      phoneNumber: updatedUser.phoneNumber,
+      role: updatedUser.role,
+      profile: updatedUser.profile,
+    };
+
+    return res.status(200).json({
+      message: "User profile updated successfully",
+      user: userData,
+      success: true,
+    });
+
+  } catch (error) {
+    console.error("Update Profile Error:", error);
+    return res.status(500).json({
+      message: error.message || "Internal Server Error",
+      success: false,
+    });
+  }
+};

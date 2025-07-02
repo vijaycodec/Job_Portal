@@ -19,7 +19,7 @@ const corsOption = {
 }
 
 app.use(cors(corsOption));
-app.use('/api', apiRoutes); // Final path: /api/auth/signup, etc.
+app.use('/api/v1', apiRoutes); // Final path: /api/auth/signup, etc.
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
