@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const companySchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        unique:true,
+        required: true,
     },
     description: {
         type: String,
@@ -12,8 +13,7 @@ const companySchema = new mongoose.Schema({
         type: String,
     },
     location: {
-        type: Number,
-        required: true
+        type: String,
     },
     logo:{
         type:String,
